@@ -11,7 +11,7 @@ export class AuthController {
 
   register = async (req: Request, res: Response) => {
     try {
-      const { email, userPss, name, surname, birthdate, zipCode } = req.body;
+      const { email, userPss, name, surname, birthdate, zipCode, tagIds } = req.body;
       
       const user = await this.authService.register({
         email,
@@ -20,6 +20,7 @@ export class AuthController {
         surname,
         birthdate: new Date(birthdate),
         zipCode,
+        tagIds: tagIds || [],
       });
 
       res.status(201).json({
@@ -142,6 +143,38 @@ export class AuthController {
       res.status(404).json({
         success: false,
         error: error instanceof Error ? error.message : 'User not found',
+      });
+    }
+  };
+
+  getAllTags = async (req: Request, res: Response) => {
+    try {
+      const tags = await this.authService.getAllTags();
+
+      res.json({
+        success: true,
+        data: { tags },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch tags',
+      });
+    }
+  };
+
+  getTagsByType = async (req: Request, res: Response) => {
+    try {
+      const tagsByType = await this.authService.getTagsByType();
+
+      res.json({
+        success: true,
+        data: { tagsByType },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch tags by type',
       });
     }
   };

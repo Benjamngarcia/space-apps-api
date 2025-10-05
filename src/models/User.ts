@@ -7,6 +7,7 @@ export interface User {
   birthdate: Date;
   zipCode: string;
   createdAt: Date;
+  tags?: Tag[];
 }
 
 export interface CreateUserData {
@@ -16,6 +17,7 @@ export interface CreateUserData {
   surname: string;
   birthdate: Date;
   zipCode: string;
+  tagIds?: number[];
 }
 
 export interface UpdateUserData {
@@ -24,6 +26,7 @@ export interface UpdateUserData {
   email?: string;
   birthdate?: Date;
   zipCode?: string;
+  tagIds?: number[];
 }
 
 export interface UserProfile {
@@ -34,6 +37,7 @@ export interface UserProfile {
   birthdate: Date;
   zipCode: string;
   createdAt: Date;
+  tags?: Tag[];
 }
 
 export interface RefreshToken {
@@ -43,4 +47,33 @@ export interface RefreshToken {
   expiresAt: Date;
   createdAt: Date;
   isRevoked: boolean;
+}
+
+export interface Tag {
+  tagId: number;
+  tagName: string;
+  tagType: string;
+}
+
+export interface UserTag {
+  userUuid: string;
+  tagId: number;
+  user?: User;
+  tag?: Tag;
+}
+
+export interface ReqHistory {
+  reqId: number;
+  inputParams: string;
+  outParams: string;
+  createdAt: Date;
+  rating?: number;
+  tags?: Tag[];
+}
+
+export interface ReqTag {
+  reqId: number;
+  tagId: number;
+  reqHistory?: ReqHistory;
+  tag?: Tag;
 }

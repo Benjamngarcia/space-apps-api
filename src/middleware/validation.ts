@@ -21,6 +21,7 @@ export const registerSchema = Joi.object({
   surname: Joi.string().required(),
   birthdate: Joi.date().required(),
   zipCode: Joi.string().required(),
+  tagIds: Joi.array().items(Joi.number().integer().positive()).optional(),
 });
 
 export const loginSchema = Joi.object({

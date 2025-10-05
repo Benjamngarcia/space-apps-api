@@ -17,12 +17,13 @@ model User {
     zipcode       String
     createdat     DateTime       @default(now())
     refreshTokens RefreshToken[]
+    userTags      UserTag[]
 
     @@map("users")
 }
 
 model RefreshToken {
-    uuid        String   @id @default(uuid())
+    uuid      String   @id @default(uuid())
     useruuid  String
     token     String   @unique
     expiresat DateTime
@@ -32,4 +33,47 @@ model RefreshToken {
     user User @relation(fields: [useruuid], references: [uuid], onDelete: Cascade)
 
     @@map("refreshtoken")
+}
+
+model Tag {
+    tagid    Int       @id @default(autoincrement())
+    tagname  String?   @db.VarChar(100)
+    tagtype  String?   @db.VarChar(100)
+    userTags UserTag[]
+    reqTags  ReqTag[]
+
+    @@map("tags")
+}
+
+model UserTag {
+    useruuid String @db.VarChar(50)
+    tagid    Int
+
+    user User @relation(fields: [useruuid], references: [uuid], onDelete: Cascade)
+    tag  Tag  @relation(fields: [tagid], references: [tagid], onDelete: Cascade)
+
+    @@id([useruuid, tagid])
+    @@map("users_tags")
+}
+
+model ReqHistory {
+    reqid       Int      @id @default(autoincrement())
+    inputparams String   @db.VarChar(255)
+    outparams   String   @db.VarChar(255)
+    createdat   DateTime @db.Timestamp(6)
+    rating      Int?
+    reqTags     ReqTag[]
+
+    @@map("reqhistory")
+}
+
+model ReqTag {
+    reqid Int
+    tagid Int
+
+    reqHistory ReqHistory @relation(fields: [reqid], references: [reqid], onDelete: Cascade)
+    tag        Tag        @relation(fields: [tagid], references: [tagid], onDelete: Cascade)
+
+    @@id([reqid, tagid])
+    @@map("req_tags")
 }

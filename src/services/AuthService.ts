@@ -47,30 +47,43 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new Error("User with this email already exists");
+      throw new Error("User already exists");
     }
 
     const hashedPassword = await this.hashPassword(userData.userPss);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: userData.email,
-        userpss: hashedPassword,
-        name: userData.name,
-        surname: userData.surname,
-        birthdate: userData.birthdate,
-        zipcode: userData.zipCode,
-      },
+    const result = await this.prisma.$transaction(async (prisma) => {
+      const user = await prisma.user.create({
+        data: {
+          email: userData.email,
+          userpss: hashedPassword,
+          name: userData.name,
+          surname: userData.surname,
+          birthdate: userData.birthdate,
+          zipcode: userData.zipCode,
+        },
+      });
+
+      if (userData.tagIds && userData.tagIds.length > 0) {
+        await prisma.userTag.createMany({
+          data: userData.tagIds.map((tagId) => ({
+            useruuid: user.uuid,
+            tagid: tagId,
+          })),
+        });
+      }
+
+      return user;
     });
 
     return {
-      uuid: user.uuid,
-      email: user.email,
-      name: user.name,
-      surname: user.surname,
-      birthdate: user.birthdate,
-      zipCode: user.zipcode,
-      createdAt: user.createdat,
+      uuid: result.uuid,
+      email: result.email,
+      name: result.name,
+      surname: result.surname,
+      birthdate: result.birthdate,
+      zipCode: result.zipcode,
+      createdAt: result.createdat,
     };
   }
 
@@ -84,6 +97,13 @@ export class AuthService {
   }> {
     const user = await this.prisma.user.findUnique({
       where: { email },
+      include: {
+        userTags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -117,6 +137,12 @@ export class AuthService {
         birthdate: user.birthdate,
         zipCode: user.zipcode,
         createdAt: user.createdat,
+        tags:
+          (user as any).userTags?.map((ut: any) => ({
+            tagId: ut.tag.tagid,
+            tagName: ut.tag.tagname || "",
+            tagType: ut.tag.tagtype || "",
+          })) || [],
       },
       accessToken,
       refreshToken,
@@ -190,6 +216,13 @@ export class AuthService {
   async getUserProfile(userUuid: string): Promise<UserProfile> {
     const user = await this.prisma.user.findUnique({
       where: { uuid: userUuid },
+      include: {
+        userTags: {
+          include: {
+            tag: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -204,6 +237,49 @@ export class AuthService {
       birthdate: user.birthdate,
       zipCode: user.zipcode,
       createdAt: user.createdat,
+      tags:
+        (user as any).userTags?.map((ut: any) => ({
+          tagId: ut.tag.tagid,
+          tagName: ut.tag.tagname || "",
+          tagType: ut.tag.tagtype || "",
+        })) || [],
     };
+  }
+
+  async getAllTags(): Promise<
+    { tagId: number; tagName: string; tagType: string }[]
+  > {
+    const tags = await this.prisma.tag.findMany({
+      orderBy: [{ tagtype: "asc" }, { tagname: "asc" }],
+    });
+
+    return tags.map((tag) => ({
+      tagId: tag.tagid,
+      tagName: tag.tagname || "",
+      tagType: tag.tagtype || "",
+    }));
+  }
+
+  async getTagsByType(): Promise<
+    Record<string, { tagId: number; tagName: string }[]>
+  > {
+    const tags = await this.prisma.tag.findMany({
+      orderBy: [{ tagtype: "asc" }, { tagname: "asc" }],
+    });
+
+    const tagsByType: Record<string, { tagId: number; tagName: string }[]> = {};
+
+    tags.forEach((tag) => {
+      const type = tag.tagtype || "Other";
+      if (!tagsByType[type]) {
+        tagsByType[type] = [];
+      }
+      tagsByType[type].push({
+        tagId: tag.tagid,
+        tagName: tag.tagname || "",
+      });
+    });
+
+    return tagsByType;
   }
 }
