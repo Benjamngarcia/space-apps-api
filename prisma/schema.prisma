@@ -17,6 +17,7 @@ model User {
     zipcode       String
     createdat     DateTime       @default(now())
     refreshTokens RefreshToken[]
+    reqHistories  ReqHistory[]
     userTags      UserTag[]
 
     @@map("users")
@@ -58,11 +59,14 @@ model UserTag {
 
 model ReqHistory {
     reqid       Int      @id @default(autoincrement())
-    inputparams String   @db.VarChar(255)
-    outparams   String   @db.VarChar(255)
-    createdat   DateTime @db.Timestamp(6)
+    useruuid    String
+    inputparams String
+    outparams   String
+    createdat   DateTime @default(now())
     rating      Int?
     reqTags     ReqTag[]
+
+    user User @relation(fields: [useruuid], references: [uuid], onDelete: Cascade)
 
     @@map("reqhistory")
 }
