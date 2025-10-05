@@ -12,8 +12,8 @@ router.get('/test', (req: Request, res: Response) => {
 });
 
 try {
-  const { fileController } = require('../../src/controllers/fileController');
-  const { authMiddleware } = require('../../src/middleware/auth');
+  const { fileController } = require('../controllers/fileController');
+  const { authMiddleware } = require('../middleware/auth');
 
   const fileCon = new fileController();
 

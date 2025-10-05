@@ -12,8 +12,8 @@ router.get('/test', (req: Request, res: Response) => {
 });
 
 try {
-  const { S3Controller } = require('../../src/controllers/S3Controller');
-  const { authMiddleware } = require('../../src/middleware/auth');
+  const { S3Controller } = require('../controllers/S3Controller');
+  const { authMiddleware } = require('../middleware/auth');
 
   const s3Controller = new S3Controller();
 

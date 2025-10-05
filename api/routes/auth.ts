@@ -26,9 +26,9 @@ router.get('/health', (req: Request, res: Response) => {
 
 // Try to load the actual auth controller with error handling
 try {
-  const { AuthController } = require('../../src/controllers/AuthController');
-  const { authMiddleware } = require('../../src/middleware/auth');
-  const { validate, registerSchema, loginSchema, refreshTokenSchema, createRequestSchema } = require('../../src/middleware/validation');
+  const { AuthController } = require('../controllers/AuthController');
+  const { authMiddleware } = require('../middleware/auth');
+  const { validate, registerSchema, loginSchema, refreshTokenSchema, createRequestSchema } = require('../middleware/validation');
 
   const authController = new AuthController();
 
