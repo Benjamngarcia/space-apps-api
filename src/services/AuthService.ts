@@ -1,6 +1,6 @@
+import { PrismaClient, ReqHistory } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
 import { CreateUserData, UserProfile } from "../models/User";
 
 export class AuthService {
@@ -39,6 +39,39 @@ export class AuthService {
 
   verifyRefreshToken(token: string): any {
     return jwt.verify(token, process.env.JWT_REFRESH_SECRET!);
+  }
+
+  async insertRequest(requestData: {
+    useruuid: string;
+    inputParams: string;
+    outParams: string;
+    createdAt: Date;
+    rating: number | null;
+    tags: number[];
+  }): Promise<ReqHistory> {
+    return this.prisma.$transaction(async (prisma) => {
+      const newRequest = await this.prisma.reqHistory.create({
+        data: {
+          useruuid: requestData.useruuid,
+          inputparams: requestData.inputParams,
+          outparams: requestData.outParams,
+          createdat: requestData.createdAt,
+          rating: requestData.rating,
+        },
+      });
+
+      const tagIds = requestData.tags || [];
+      if (tagIds.length > 0) {
+        await prisma.reqTag.createMany({
+          data: tagIds.map((tagId) => ({
+            reqid: newRequest.reqid,
+            tagid: tagId,
+          })),
+        });
+      }
+
+      return newRequest;
+    });
   }
 
   async register(userData: CreateUserData): Promise<UserProfile> {
@@ -244,6 +277,41 @@ export class AuthService {
           tagType: ut.tag.tagtype || "",
         })) || [],
     };
+  }
+
+  async getTagById(
+    tagId: number
+  ): Promise<{ tagData: string } | null> {
+    const tag = await this.prisma.tag.findUnique({
+      where: { tagid: tagId },
+    });
+
+    if (!tag) {
+      return null;
+    }
+
+    return { tagData: `${tag.tagname},${tag.tagtype},${tag.tagid}` };
+  }
+
+  async getTagsByList(tagIds: number[]): Promise<
+    string[]
+  > {
+    var tags: { tagData: string }[] = [];
+    for (const id of tagIds) {
+      if (isNaN(id)) {
+        throw new Error(`Invalid tag ID provided: ${id}. Service level`);
+      } else {
+        const tag = await this.getTagById(id);
+        if (tag) {
+          tags.push(tag);
+        }
+      }
+    }
+    const tagTexts: string[] = [];
+    for (const utag of tags) {
+      tagTexts.push(utag.tagData);
+    }
+    return tagTexts;
   }
 
   async getAllTags(): Promise<

@@ -14,6 +14,9 @@ router.post('/refresh', validate(refreshTokenSchema), authController.refreshToke
 // Tag routes (public - for registration form)
 router.get('/tags', authController.getAllTags);
 router.get('/tags/by-type', authController.getTagsByType);
+router.get('/tags/:id', authController.getTagById);
+router.post('/tags/by-list', authController.getTagsByList);
+router.post('/requests', authController.createRequest);
 
 // Protected routes
 router.post('/logout', authMiddleware, authController.logout);
