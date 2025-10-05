@@ -7,10 +7,10 @@ import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-// Import routes
-import authRoutes from '../src/routes/auth';
-import s3Routes from '../src/routes/s3';
-import dataRoutes from '../src/routes/files';
+// Import routes from local API directory
+import authRoutes from './routes/auth';
+import s3Routes from './routes/s3';
+import dataRoutes from './routes/files';
 
 dotenv.config();
 
