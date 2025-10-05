@@ -2,6 +2,8 @@ import { parse } from "csv-parse/sync";
 import { Request, Response } from "express";
 import { S3Service } from "../services/S3Service";
 import { coutygeoId } from "./utils";
+import fs from "fs";
+import path from "path";
 
 
 export class S3Controller {
@@ -94,7 +96,8 @@ export class S3Controller {
     getFileData = async (req: Request, res: Response) => {
         try{
             //obtener los datos del archivo en ./aqi_zipcodes_usa.csv
-            const fileContent = await this.s3Service.readFile("./aqi_zipcodes_usa.csv");
+            const csvPath = path.join(__dirname, "aqi_zipcodes_usa.csv");
+            const fileContent = fs.readFileSync(csvPath, "utf-8");
             const records: string[][] = parse(fileContent, {
                 skip_empty_lines: true,
             });
