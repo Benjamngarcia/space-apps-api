@@ -1,11 +1,13 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import dotenv from 'dotenv';
+import express from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
 import authRoutes from './routes/auth';
+import s3Routes from './routes/s3';
+import dataRoutes from './routes/files';
 
 dotenv.config();
 
@@ -23,6 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
+app.use('/api/s3', s3Routes);
+app.use('/api/files', dataRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
