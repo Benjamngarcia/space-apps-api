@@ -39,6 +39,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.9.0",
+    "@vercel/node": "^5.3.24",
     "jest": "^30.2.0",
     "prisma": "^5.22.0",
     "ts-jest": "^29.4.4",

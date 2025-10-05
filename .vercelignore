@@ -1,0 +1,11 @@
+node_modules
+.env
+.git
+dist
+src
+tsconfig.json
+README.md
+.gitignore
+jest.config.js
+*.test.ts
+*.spec.ts
