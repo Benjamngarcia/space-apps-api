@@ -1,9 +1,13 @@
 {
   "version": 2,
+  "buildCommand": "prisma generate",
   "builds": [
     {
       "src": "api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["src/**", "prisma/**", "node_modules/.prisma/**"]
+      }
     }
   ],
   "routes": [
