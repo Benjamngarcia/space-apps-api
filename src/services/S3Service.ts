@@ -3,8 +3,7 @@ import {
     ListObjectsV2Command,
     S3Client,
 } from "@aws-sdk/client-s3";
-
-export class S3Service {
+    export class S3Service {
     private s3Client: S3Client;
     private bucketName: string;
 
@@ -29,10 +28,6 @@ export class S3Service {
         });
         this.bucketName = process.env.S3_BUCKET_NAME;
     }
-
-    /**
-     * Lista los objetos en el bucket de S3.
-     */
     public async listFiles() {
         const command = new ListObjectsV2Command({
             Bucket: this.bucketName,
