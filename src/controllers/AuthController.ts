@@ -229,8 +229,18 @@ export class AuthController {
 
   createRequest = async (req: AuthRequest, res: Response) => {
     try {
+      // Ensure user is authenticated
+      if (!req.user?.userUuid) {
+        return res.status(401).json({
+          success: false,
+          error: 'User not authenticated',
+        });
+      }
+
       console.log("Request body:", req.body);
-      const { uuid, tagIds, outDate, countryId } = req.body;
+      const { tagIds, outDate, countryId } = req.body;
+      const userUuid = req.user.userUuid; // Use authenticated user's UUID
+      
       const dataPred = {//obtencion por MLServ
         "countryId": countryId,
         "NO2": 12.34,
@@ -334,7 +344,7 @@ You are an environmental health assistant. Using the air quality data and user c
       }
 
       const reqDB = {
-        useruuid: uuid,
+        useruuid: userUuid,
         inputParams: `{"countryId": ${reqInput.countryId}, "NO2": ${reqInput.NO2}, "O3": ${reqInput.O3}, "CH2O": ${reqInput.CH2O}, "PM": ${reqInput.PM}}`,
         outParams: JSON.stringify(apiResponse),
         createdAt: new Date(),

@@ -32,3 +32,10 @@ export const loginSchema = Joi.object({
 export const refreshTokenSchema = Joi.object({
   refreshToken: Joi.string().required(),
 });
+
+export const createRequestSchema = Joi.object({
+  tagIds: Joi.array().items(Joi.number().integer().positive()).required(),
+  outDate: Joi.string().optional(),
+  countryId: Joi.string().required(),
+  uuid: Joi.string().optional(), // Allow but ignore - we use authenticated user's UUID
+});

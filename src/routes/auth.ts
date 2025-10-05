@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { AuthController } from '../controllers/AuthController';
 import { authMiddleware } from '../middleware/auth';
-import { validate, registerSchema, loginSchema, refreshTokenSchema } from '../middleware/validation';
+import { validate, registerSchema, loginSchema, refreshTokenSchema, createRequestSchema } from '../middleware/validation';
 
 const router = Router();
 const authController = new AuthController();
@@ -16,10 +16,10 @@ router.get('/tags', authController.getAllTags);
 router.get('/tags/by-type', authController.getTagsByType);
 router.get('/tags/:id', authController.getTagById);
 router.post('/tags/by-list', authController.getTagsByList);
-router.post('/requests', authController.createRequest);
 
 // Protected routes
 router.post('/logout', authMiddleware, authController.logout);
 router.get('/profile', authMiddleware, authController.getProfile);
+router.post('/requests', authMiddleware, validate(createRequestSchema), authController.createRequest);
 
 export default router;
