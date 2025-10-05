@@ -4,7 +4,7 @@ import { parse } from "csv-parse/sync";
 export async function getFileData(){
     try {
             //obtener los datos del archivo en ./aqi_zipcodes_usa.csv
-            const fileContent = await readFile("./src/controllers/aqi_zipcodes_usa.csv");
+            const fileContent = await readFile("./api/controllers/aqi_zipcodes_usa.csv");
             const records: string[][] = parse(fileContent, {
                 skip_empty_lines: true,
             });
